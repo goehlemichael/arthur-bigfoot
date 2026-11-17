@@ -7,7 +7,7 @@ permissions:
 jobs:
   field-lab:
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v6
         with:
@@ -18,10 +18,25 @@ jobs:
       - name: Install pinned development dependencies
         working-directory: experiments/field-lab
         run: npm install --ignore-scripts --no-audit --no-fund
-      - name: Package development dependency snapshot
-        run: tar -czf field-lab-dependencies.tar.gz -C experiments/field-lab node_modules package-lock.json
+      - name: Test real rigid-body simulation
+        working-directory: experiments/field-lab
+        run: npm test
+      - name: Build local-only runtime
+        working-directory: experiments/field-lab
+        run: npm run build
+      - name: Install browser test runner
+        run: |
+          python3 -m venv .venv
+          .venv/bin/pip install playwright==1.57.0
+          .venv/bin/python -m playwright install --with-deps chromium
+      - name: Test browser and offline clearing
+        run: .venv/bin/python experiments/field-lab/tests/browser.py
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: field-lab-dependencies
-          path: field-lab-dependencies.tar.gz
-          retention-days: 3
+          name: forest-physics-lab-preview
+          path: |
+            experiments/field-lab/dist
+            experiments/field-lab/test-results
+            experiments/field-lab/package-lock.json
+          retention-days: 14
