@@ -1,0 +1,27 @@
+name: Forest physics lab
+on:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  field-lab:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned development dependencies
+        working-directory: experiments/field-lab
+        run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Package development dependency snapshot
+        run: tar -czf field-lab-dependencies.tar.gz -C experiments/field-lab node_modules package-lock.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: field-lab-dependencies
+          path: field-lab-dependencies.tar.gz
+          retention-days: 3

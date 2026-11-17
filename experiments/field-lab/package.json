@@ -1,0 +1,1 @@
+{"name":"arthur-field-lab","private":true,"type":"module","version":"0.6.0-preview","scripts":{"test":"node --test tests/*.test.mjs","build":"node tools/build.mjs"},"dependencies":{"@dimforge/rapier3d-compat":"0.17.3","three":"0.180.0"},"devDependencies":{"esbuild":"0.25.10"}}
