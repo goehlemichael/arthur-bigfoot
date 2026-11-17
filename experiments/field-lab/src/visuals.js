@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { PAD, scenery, seeded } from './physics.js';
+import { cedarCanopy, fernGeometry } from './foliage.js';
 export { THREE };
 const v = (x=0,y=0,z=0)=>new THREE.Vector3(x,y,z);
 function mat(color,extra={}){return new THREE.MeshStandardMaterial({color,roughness:.85,...extra});}
@@ -21,9 +22,9 @@ function mergedFur(parent,parts,seed=4) {
  for(const part of parts){const {pos,scale,count}=part;
    const g=shapes.sphere.clone();g.scale(...scale);g.translate(...pos);geometries.push(g);
    for(let i=0;i<count;i++) {const a=r()*Math.PI*2,h=r()*1.8-.9,k=Math.sqrt(1-h*h);const p=v(Math.cos(a)*scale[0]*k,h*scale[1],Math.sin(a)*scale[2]*k).add(v(...pos));
-    const tuft=shapes.cone.clone();tuft.scale(.028+r()*.028,.07+r()*.065,.035);tuft.rotateZ((r()-.5)*.45);tuft.rotateX(Math.PI);tuft.translate(...p.toArray());geometries.push(tuft);}
+    const tuft=shapes.cone.clone();tuft.scale(.03+r()*.025,.035+r()*.035,.034);tuft.rotateZ((r()-.5)*.45);tuft.rotateX(Math.PI);tuft.translate(...p.toArray());geometries.push(tuft);}
  }
- for(const g of geometries){const count=g.attributes.position.count;const arr=new Float32Array(count*3);const col=new THREE.Color().setHSL(.075,.34,.19+r()*.09);for(let i=0;i<count;i++)arr.set([col.r,col.g,col.b],i*3);g.setAttribute('color',new THREE.BufferAttribute(arr,3));}
+ for(const g of geometries){const count=g.attributes.position.count;const arr=new Float32Array(count*3);const col=new THREE.Color().setHSL(.075,.34,.27+r()*.09,THREE.SRGBColorSpace);for(let i=0;i<count;i++)arr.set([col.r,col.g,col.b],i*3);g.setAttribute('color',new THREE.BufferAttribute(arr,3));}
  const g=mergeGeometries(geometries);geometries.forEach(g=>g.dispose());const m=new THREE.Mesh(g,new THREE.MeshStandardMaterial({vertexColors:true,roughness:.96}));m.castShadow=true;m.receiveShadow=true;parent.add(m);
 }
 export function createArthur(){
@@ -45,16 +46,15 @@ export function createArthur(){
  return {root,arms,legs,head,scarf,setScarf(name){sm.color.set(({Tartan:'#7b5041',Green:'#435c45',Blue:'#455e75',Hemp:'#b7a276'})[name]||'#7b5041');},animate(t,speed,carry=false){let gait=t*(speed>5?10:7.2);legs[0].rotation.x=Math.sin(gait)*Math.min(speed/4,1)*.48;legs[1].rotation.x=-legs[0].rotation.x;arms.forEach((a,i)=>{a.rotation.x=carry?-.9:Math.sin(gait+i*Math.PI)*Math.min(speed/5,1)*.3;a.rotation.z=i?-.05:.05;});head.rotation.y=speed<.2?Math.sin(t*.6)*.12:0;torso.rotation.x=speed>5?.08:0;}};
 }
 function fernGroup(positions){
- const leaf=new THREE.Shape();leaf.moveTo(0,0);leaf.quadraticCurveTo(.17,.4,0,.85);leaf.quadraticCurveTo(-.17,.4,0,0);
- const geo=new THREE.ShapeGeometry(leaf,4);geo.rotateX(-.35);const m=mat('#65864b',{side:THREE.DoubleSide});
+ const geo=fernGeometry();const m=mat('#65864b',{side:THREE.DoubleSide});
  const inst=new THREE.InstancedMesh(geo,m,positions.length*7);let i=0;const d=new THREE.Object3D();for(const p of positions)for(let j=0;j<7;j++){d.position.set(p.x,.04,p.z);d.rotation.set(.4,j*Math.PI*2/7,Math.sin(j)*.4);d.scale.setScalar(p.s);d.updateMatrix();inst.setMatrixAt(i++,d.matrix);}inst.receiveShadow=true;return inst;
 }
 export function createEnvironment(scene,lab){
  const groundMaterial=mat('#7b815c',{map:texture('earth'),roughness:1});const ground=mesh('box',groundMaterial,[0,-.32,0],[60,.3,60]);scene.add(ground);
  const barkMap=texture('bark');palette.bark.map=barkMap;palette.bark.needsUpdate=true;
- const trunkGeo=new THREE.CylinderGeometry(1,1.25,1,9),trunks=new THREE.InstancedMesh(trunkGeo,palette.bark,scenery().length);const crowns=new THREE.InstancedMesh(new THREE.ConeGeometry(1,1,9),mat('#314e35'),scenery().length*4);let i=0,j=0;const d=new THREE.Object3D();
+ const trunkGeo=new THREE.CylinderGeometry(1,1.25,1,9),trunks=new THREE.InstancedMesh(trunkGeo,palette.bark,scenery().length);const crowns=new THREE.InstancedMesh(cedarCanopy(),mat('#ffffff',{vertexColors:true,side:THREE.DoubleSide}),scenery().length);let i=0,j=0;const d=new THREE.Object3D();
  for(const t of scenery()){d.position.set(t.x,t.h/2,t.z);d.scale.set(t.r,t.h,t.r);d.rotation.set(0,t.seed,0);d.updateMatrix();trunks.setMatrixAt(i++,d.matrix);
-   for(let k=0;k<4;k++){d.position.set(t.x,t.h*.55+k*t.h*.12,t.z);d.scale.set(3.1-k*.5,t.h*.38,3.1-k*.5);d.updateMatrix();crowns.setMatrixAt(j++,d.matrix);}}
+   d.position.set(t.x,t.h*.36,t.z);d.scale.set(3.7,t.h*.68,3.7);d.updateMatrix();crowns.setMatrixAt(j++,d.matrix);}
  trunks.castShadow=trunks.receiveShadow=true;crowns.castShadow=crowns.receiveShadow=true;scene.add(trunks,crowns);
  const r=seeded(79),ferns=[];for(let i=0;i<420;i++){let x=(r()-.5)*75,z=(r()-.5)*75;if(Math.abs(x)<2&&z>-12&&z<13)continue;if(Math.hypot(x-PAD.x,z-PAD.z)<4)continue;ferns.push({x,z,s:.5+r()*1.4});}scene.add(fernGroup(ferns));
  for(let i=0;i<16;i++){const x=16+Math.sin(i*.28)*2,z=-28+i*4;const water=mesh('sphere',mat('#587b77',{metalness:.25,roughness:.2}),[x,-.09,z],[2.2,.14,3.1]);water.castShadow=false;scene.add(water);}
@@ -70,10 +70,10 @@ export function createEnvironment(scene,lab){
 export function treeVisual(t){
  const root=new THREE.Group();root.add(mesh('cylinder',palette.bark,[0,0,0],[t.r,t.length/2,t.r]));
  for(const s of [-1,1])root.add(mesh('cylinder',palette.wood,[0,s*(t.length/2+.002),0],[t.r*.92,.009,t.r*.92]));
- const crown=new THREE.Group();for(let i=0;i<3;i++)crown.add(mesh('cone',mat(['#38593c','#466844','#55774b'][i]),[0,t.length*.25+i*.85,0],[1.7-i*.4,1.5-i*.2,1.7-i*.4]));root.add(crown);
+ const crown=new THREE.Mesh(cedarCanopy(),mat('#ffffff',{vertexColors:true,side:THREE.DoubleSide}));crown.position.y=-t.length*.16;crown.scale.set(2.2,t.length*.76,2.2);crown.castShadow=true;root.add(crown);
  const band=mesh('cylinder',palette.gold,[0,-t.length/2+.45,0],[t.r*1.04,.05,t.r*1.04]);root.add(band);
  const stump=mesh('cylinder',palette.bark,[t.x,.35,t.z],[t.r*1.12,.35,t.r*1.12]);const cap=mesh('cylinder',palette.wood,[t.x,.706,t.z],[t.r*1.02,.012,t.r*1.02]);
- return {root,stump,cap,crown,band};
+ const splinters=new THREE.Group();for(let i=0;i<9;i++){const a=i*Math.PI*2/9;splinters.add(mesh('cone',palette.wood,[t.x+Math.cos(a)*t.r*.7,.78+(i%3)*.03,t.z+Math.sin(a)*t.r*.7],[.035,.08+(i%3)*.025,.045],[0,a,0]));}return {root,stump,cap,crown,band,splinters};
 }
 export function aircraftVisual(kind){
  const root=new THREE.Group(),rotors=[];

@@ -20,24 +20,23 @@ with tempfile.TemporaryDirectory() as temp, sync_playwright() as pw:
         page=start(ctx);page.wait_for_timeout(800)
         assert page.evaluate("!!document.querySelector('#view').getContext('webgl2')")
         page.screenshot(path=str(OUT/'clearing.png'))
+        expect(page.locator('#update')).to_be_hidden()
         before=page.evaluate('window.__LAB__.lab.player.translation().z');page.keyboard.down('w');page.wait_for_timeout(400);page.keyboard.up('w');assert page.evaluate('window.__LAB__.lab.player.translation().z')<before
         page.locator('#pause').click();t=page.evaluate('window.__LAB__.lab.time');page.wait_for_timeout(150);assert page.evaluate('window.__LAB__.lab.time')==t;page.locator('#pause').click()
         for i in [0,1]:
             page.evaluate('(i)=>{const l=window.__LAB__.lab,t=l.trees[i];l.player.setTranslation({x:t.x,y:1.3,z:t.z+1.6},true);l.player.setLinvel({x:0,y:0,z:0},true)}',i)
             for _ in range(4):page.locator('#push').click()
             assert page.evaluate('(i)=>window.__LAB__.lab.trees[i].broken',i)
-            page.wait_for_timeout(1400)
+            page.wait_for_function('(i)=>window.__LAB__.lab.trees[i].body.translation().y < 1.5',arg=i,timeout=30000)
             page.evaluate('(i)=>{const l=window.__LAB__.lab,p=l.trees[i].body.translation();l.player.setTranslation({x:p.x+2,y:1.3,z:p.z},true);l.player.setLinvel({x:0,y:0,z:0},true)}',i)
             page.locator('#carry').click();assert page.evaluate('!!window.__LAB__.lab.held')
             page.evaluate('()=>{const l=window.__LAB__.lab;l.player.setTranslation({x:-3,y:1.3,z:-9},true);l.player.setLinvel({x:0,y:0,z:0},true)}')
             page.locator('#brace').click()
             assert page.evaluate('window.__LAB__.lab.braces.length')==i+1
-        page.locator('#drone').click();assert page.evaluate('window.__LAB__.mode')=='drone';page.wait_for_timeout(1600)
-        assert page.evaluate('window.__LAB__.lab.drone.body.translation().y')>2.5
+        page.locator('#drone').click();assert page.evaluate('window.__LAB__.mode')=='drone';page.wait_for_function('window.__LAB__.lab.drone.body.translation().y > 2.5',timeout=30000)
         page.keyboard.down('w');page.wait_for_timeout(350);page.keyboard.up('w')
         page.screenshot(path=str(OUT/'drone.png'))
-        page.locator('#pilot').click();page.locator('#rocket').click();page.wait_for_timeout(1700)
-        assert page.evaluate('window.__LAB__.lab.rocket.body.translation().y')>5
+        page.locator('#pilot').click();page.locator('#rocket').click();page.wait_for_function('window.__LAB__.lab.rocket.body.translation().y > 5',timeout=30000)
         page.screenshot(path=str(OUT/'launch.png'))
         assert page.evaluate('window.__LAB__.save()')
         expect(page.locator('#status')).to_contain_text('Offline ready',timeout=15000)
