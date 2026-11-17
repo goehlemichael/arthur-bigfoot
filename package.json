@@ -1,0 +1,1 @@
+{"name":"arthur-bigfoot","version":"0.4.1-rebuilt","private":true,"type":"module","scripts":{"test":"node --test tests/*.test.mjs"}}

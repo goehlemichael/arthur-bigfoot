@@ -1,0 +1,66 @@
+name: Validate and publish Arthur
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: arthur-pages-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  validate:
+    # Keep the OS compatible with the pinned Playwright browser build.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Test deployment validator
+        run: python3 -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Test game, wardrobe, saves and cache rules
+        run: node --test tests/*.test.mjs
+      - name: Check syntax and static asset paths
+        run: |
+          for file in site/*.js; do node --check "$file"; done
+          python3 tools/validate_site.py site
+      - name: Install browser test runner
+        run: |
+          python3 -m venv .venv
+          .venv/bin/pip install playwright==1.57.0
+          .venv/bin/python -m playwright install --with-deps chromium
+      - name: Test served WebGL game, offline reload and update
+        run: .venv/bin/python tests/browser_smoke.py --screenshots test-results
+
+  publish:
+    if: github.repository == 'goehlemichael/arthur-bigfoot' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: validate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+      - name: Upload website only
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+      - name: Publish
+        id: deployment
+        uses: actions/deploy-pages@v4
