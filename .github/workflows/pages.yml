@@ -17,15 +17,26 @@ concurrency:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
       - name: Test deployment validator
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
-      - name: Require game files and check static asset paths
-        run: python3 tools/validate_site.py site
+      - name: Test game, wardrobe, saves and cache rules
+        run: node --test tests/*.test.mjs
+      - name: Check syntax and static asset paths
+        run: |
+          for file in site/*.js; do node --check "$file"; done
+          python3 tools/validate_site.py site
+      - name: Install browser test runner
+        run: |
+          python3 -m venv .venv
+          .venv/bin/pip install playwright==1.57.0
+          .venv/bin/python -m playwright install --with-deps chromium
+      - name: Test served WebGL game, offline reload and update
+        run: .venv/bin/python tests/browser_smoke.py --screenshots test-results
 
   publish:
     if: github.repository == 'goehlemichael/arthur-bigfoot' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'

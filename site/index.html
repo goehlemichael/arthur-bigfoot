@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#182c25">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Arthur">
+<title>Arthur • A perfectly manageable Tuesday</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="./style.css">
+</head>
+<body data-mode="wardrobe">
+<div id="viewport"><canvas id="scene" aria-label="3D Arthur character and forest"></canvas><div class="vignette"></div></div>
+<header><div class="brand"><span class="crest">A</span><div><strong>ARTHUR</strong><small>BRILLIANT MIND. QUIET LIFE.</small></div></div><nav aria-label="Game menu"><button id="wardrobeBtn" hidden>Wardrobe</button><button id="pauseBtn" hidden>Pause</button><button id="helpBtn">Help & saves</button></nav></header>
+<main id="wardrobe">
+<section class="intro"><span class="eyebrow">A BIGFOOT STORY</span><h1>Properly<br>prepared.</h1><p>Quite extraordinary.<br>Preferably, unnoticed.</p><span class="edition">RECOVERY BUILD · <span id="version"></span></span></section>
+<div id="orbitControls"><button id="turnLeft" aria-label="Rotate Arthur left">↶</button><span>DRAG TO TURN</span><button id="turnRight" aria-label="Rotate Arthur right">↷</button><button id="zoomBtn">Face view</button></div>
+<aside class="wardrobe-panel"><div class="panel-heading"><span class="eyebrow">THE MORNING RITUAL</span><h2>A few finishing touches.</h2><p>Different looks. Same Arthur. Always proper.</p></div><div id="categories" role="tablist" aria-label="Appearance categories"></div><div id="options" role="tabpanel" aria-label="Appearance choices"></div><div class="pose-row"><label for="pose">Preview movement</label><select id="pose"><option>Idle</option><option>Shy</option><option>Walk</option><option>Sneak</option><option>Sip</option></select></div><button id="playBtn" class="primary">Into the forest <span>→</span></button><p class="small-note">A small, playable 3D reconstruction. Not the lost v0.4 model.</p></aside>
+</main>
+<section id="hud" hidden aria-label="Mission status"><div class="mission"><span class="eyebrow">ARTHUR’S TUESDAY</span><h2 id="taskTitle"></h2><p id="taskCopy"></p><span id="distance"></span></div><div class="privacy"><label for="exposure">ATTENTION <span id="cover"></span></label><meter id="exposure" min="0" max="1" value="0"></meter><p>Photographs <strong id="evidence">0</strong> · Composure <strong id="composure">Impeccable</strong></p></div><div id="objectiveHint"></div></section>
+<div id="subtitle" role="status" hidden></div>
+<div id="touch" hidden><div id="joystick" aria-label="Movement joystick"><span id="stick"></span></div><div class="action-buttons"><button id="sneakBtn" aria-pressed="false">Sneak</button><button id="actionBtn" class="primary">Interact</button></div></div>
+<footer><span id="offline">Checking offline files…</span><span id="saveStatus" role="status">Local save</span><button id="updateBtn" hidden>Save & update</button></footer>
+<dialog id="help"><span class="eyebrow">A MOMENT OF PRIVACY</span><h2>Tea can wait. Your save cannot.</h2><p>Move with WASD or arrows. Hold Shift to sneak. E to interact. Escape to pause. On a phone, use the thumbstick and buttons. Follow the gold beacon; tree trunks and fern cover help you hide from Gary.</p><p>On iPhone, open the published website in Safari. After “Offline ready”, use Share → Add to Home Screen. Your first visit and updates need a connection. Clearing website data can remove your save; keep an exported backup.</p><div class="save-actions"><button id="exportBtn">Export save</button><label class="button" for="importFile">Import save<input id="importFile" type="file" accept=".json,application/json" hidden></label><button id="newBtn">New Tuesday</button></div><p class="small-note">This replacement uses procedural 3D parts. The previous GLB, original test results, WebAssembly module and voice recordings are not part of this build.</p><button id="closeHelp" class="primary">Carry on →</button></dialog>
+<dialog id="workbench"><span class="eyebrow">PROPULSION WORKBENCH</span><h2>A matter of calibration.</h2><p>Set the three channels to <strong>2 · 4 · 1</strong>. Adjust each dial, then run the test.</p><div id="dials"></div><p id="benchResult" role="status"></p><div class="save-actions"><button id="testBtn" class="primary">Run propulsion test</button><button id="closeBench">Step away</button></div></dialog>
+<div id="fatal" hidden role="alert"></div><noscript>This game needs JavaScript enabled.</noscript>
+<script type="module" src="./main.js"></script>
+</body></html>
