@@ -1,8 +1,8 @@
 // Bump VERSION whenever any shipped file changes. Never mix runtime files between releases.
-const VERSION='0.4.1-rebuilt';
+const VERSION='0.5.0-silo';
 const PREFIX='arthur:'+new URL(self.registration.scope).pathname+':';
 const CACHE=PREFIX+VERSION;
-const ASSETS=['./','./index.html','./style.css','./main.js','./engine.js','./world.js','./game.js','./offline.js','./manifest.webmanifest','./icon.svg'];
+const ASSETS=['./','./index.html','./style.css','./bunker.css','./main.js','./engine.js','./world.js','./game.js','./bunker-layout.js','./bunker.js','./offline.js','./manifest.webmanifest','./icon.svg'];
 const urls=ASSETS.map(path=>new URL(path,self.registration.scope).href);
 self.addEventListener('install',event=>event.waitUntil((async()=>{
   const cache=await caches.open(CACHE);

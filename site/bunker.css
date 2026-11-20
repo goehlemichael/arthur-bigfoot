@@ -1,0 +1,16 @@
+/* Silo-specific additions; the existing wardrobe and touch layout stay intact. */
+#observatory{background:#142a33;border-color:#76bfc37a;width:min(650px,94vw)}
+#observatory .eyebrow{color:#9bd3ce}#terminalQuote{margin:18px 0;font:italic 18px/1.5 Georgia,serif;color:#d7c69c;border-left:2px solid #7d9b99;padding-left:16px}
+#terminalArt{height:210px;position:relative;overflow:hidden;border:1px solid #7696a34a;border-radius:9px;background:radial-gradient(ellipse at center,#14354c,#071820 75%)}
+#terminalArt::before{content:"";position:absolute;inset:0;background-image:radial-gradient(#a5c6d5 1px,transparent 1px),radial-gradient(#778b9e 1px,transparent 1px);background-size:47px 41px,71px 67px;background-position:0 0,21px 11px;opacity:.55}
+#terminalArt>span{position:absolute;bottom:12px;left:14px;font:9px ui-monospace,monospace;letter-spacing:.15em;color:#93b9c3}
+.celestial{position:absolute;left:50%;top:48%;width:118px;height:118px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse at 35% 26%,#b6dcc3 0 12%,transparent 13%),radial-gradient(ellipse at 65% 65%,#82ae91 0 22%,transparent 23%),radial-gradient(circle at 30% 25%,#78b2ca,#225780 68%,#0d293b);box-shadow:0 0 28px #62c7dc55,inset -14px -8px 15px #051c3388}
+.orbit{position:absolute;left:50%;top:48%;width:220px;height:130px;border:1px solid #86c4d481;border-radius:50%;transform:translate(-50%,-50%) rotate(-22deg)}
+.orbit-b{width:285px;height:165px;transform:translate(-50%,-50%) rotate(25deg);opacity:.6}.orbit-c{width:350px;height:190px;opacity:.35}
+[data-view=galaxy] .celestial{width:210px;height:90px;transform:translate(-50%,-50%) rotate(-20deg);background:radial-gradient(ellipse,#f8e9c1 0 4%,#a8a6d0 10%,#5e6eaa 25%,transparent 65%);box-shadow:0 0 40px #8e8ab033}
+[data-view=galaxy] .orbit{border-color:#a5a1d64d;transform:translate(-50%,-50%) rotate(-20deg);height:65px}
+[data-view=radar] .celestial{width:150px;height:150px;background:conic-gradient(from 30deg,transparent,#79c4ad66,transparent 35%);box-shadow:inset 0 0 0 1px #82c0ab,0 0 30px #6cc6a522}
+[data-view=radar] .orbit{width:100px;height:100px;border-color:#88cdb36b;transform:translate(-50%,-50%)}[data-view=radar] .orbit-b{width:50px;height:50px}[data-view=radar] .orbit-c{width:150px;height:150px}
+[data-view=orbits] .celestial{width:28px;height:28px;background:#f1cf87;box-shadow:0 0 30px #e6c47e88}
+button:disabled{opacity:.55;cursor:default}#objectiveHint{max-width:calc(100vw - 28px);white-space:normal;text-align:center}
+@media(orientation:portrait) and (max-width:760px){#subtitle{bottom:calc(250px + var(--safe))}#terminalArt{height:170px}.mission p{max-width:55ch}#observatory{padding:20px}#observatory h2{font-size:26px}#hud .privacy{background:#12291fa8}#terminalArt>span{font-size:8px}}
