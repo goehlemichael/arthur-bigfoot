@@ -1,5 +1,6 @@
 import {transform as T,multiply as M,identity} from './engine.js';
-import {TREES,FERNS,MARKERS,gary,target} from './game.js';
+import {TREES,FERNS,MARKERS,gary,target,sceneArea} from './game.js';
+import {drawBunker,drawHatch} from './bunker.js';
 const fur=['#795338','#66452f','#825d3d','#573e2d'];
 // Articulated rigid parts, not a recovered skinned GLB. Attachment transforms are explicit.
 export function drawArthur(r,look,root,time,walking=false,sneak=false,gesture='Idle'){
@@ -21,11 +22,12 @@ export function drawArthur(r,look,root,time,walking=false,sneak=false,gesture='I
     let armAngle=-swing*.7;
     if(gesture==='Sip'&&side===1)armAngle=-.8;
     if(gesture==='Shy')armAngle=-.25;
+    if(gesture==='Climb')armAngle=-2.5+Math.sin(time*5+side)*.32;
     const arm=M(torso,T(side*.78,2.02,0,1,1,1,armAngle,0,side*.10));
     add('sphere',side*.03,-.48,0,.27,.65,.28,fur[0],arm);
     add('sphere',side*.02,-1.01,.04,.24,.29,.21,fur[2],arm);
     for(let i=0;i<4;i++)add('sphere',side*(-.14+i*.09),-1.20,.13,.055,.14,.07,'#90694a',arm);
-    if(side===1){
+    if(side===1&&gesture!=='Climb'){
       const cup=M(arm,T(.03,-.94,.33,1,1,1,gesture==='Sip'?-.25:0));
       const cold=['Boba','Iced coffee','Matcha'].includes(look.drink),drinkColors={'British tea':'#a57048','Earl Grey':'#744832',Matcha:'#94ad64',Chai:'#c29b71',Boba:'#c99e79','Iced coffee':'#503529'};
       add('sphere',0,0,0,.19,cold?.27:.18,.19,cold?drinkColors[look.drink]:'#eee0b8',cup);
@@ -78,16 +80,8 @@ export function drawArthur(r,look,root,time,walking=false,sneak=false,gesture='I
 }
 export function drawWorld(r,s,mode,time){
   const add=(kind,x,y,z,sx,sy,sz,c,rx=0,ry=0,rz=0)=>r.add(kind,T(x,y,z,sx,sy,sz,rx,ry,rz),c);
-  if(s.area==='lab'&&mode==='play'){
-    add('box',0,-.30,0,13,.30,13,'#514d40');add('box',0,4,-12,13,4,.4,'#3e4743');
-    for(let i=-10;i<=10;i+=4){add('box',i,3,-11.5,.06,2.7,.06,'#89988b');add('box',i,5.8,-10,.09,.04,2,'#c7deca')}
-    add('box',0,1.1,-3,2.6,.14,.85,'#b09868');for(const x of [-2,2])add('box',x,.5,-3,.1,.5,.5,'#555f57');
-    add('sphere',0,1.70,-3,.6,.6,.6,s.stage>=4?'#a5dbc8':'#71b8bf');
-    add('sphere',6,2.3,-6,1.5,1.2,3.6,'#9ca9a0');add('cone',6,2.3,-9,1.3,2.0,1.3,'#c7cabb',Math.PI/2);
-    add('box',6,2.0,-4,3.2,.1,.7,'#747f76',0,.1,0);add('sphere',6,2.3,-2.3,.9,.9,.18,s.stage>=4?'#9ddbc2':'#547d79');
-    add('box',-6,.65,3,1.5,.12,.8,'#967648');for(const x of [-7,-5])add('box',x,.3,3,.09,.3,.7,'#6c5840');
-    add('sphere',-6,1.2,3,.32,.38,.32,'#ddceab');add('cone',-6.4,1.23,3,.12,.26,.12,'#cfc19d',0,0,.8);
-    add('box',-6,.02,6,3,.02,2,'#7f5251');
+  if(sceneArea(s)==='lab'&&mode==='play'){
+    drawBunker(r,s,time);
   }else{
     add('box',0,-.32,0,65,.30,65,'#526748');
     add('box',0,-.04,4,2.6,.04,23,'#7b8060');
@@ -105,7 +99,7 @@ export function drawWorld(r,s,mode,time){
     }
     add('sphere',0,.18,-6,1.5,.45,1.2,'#657d77');add('sphere',0,.70,-6,.35,.35,.35,s.stage?'#828779':'#afe1cb');
     add('box',11,1,-15,.08,1,.08,'#66553c');add('box',11,1.70,-15,.24,.18,.18,'#424d3e');add('sphere',11,1.70,-14.8,.09,.09,.04,'#bcc9a4');
-    add('sphere',0,1,23,3,1.8,1.3,'#74806c');add('box',0,1.15,21.8,.9,1.15,.09,'#2c3e34');
+    drawHatch(r,time);
     if(mode==='play'){
       const g=gary(s.time);const root=T(g.x,0,g.z,.65,.65,.65,0,g.heading);
       r.add('sphere',M(root,T(0,1.2,0,.45,.65,.30)),'#b39b6a');r.add('sphere',M(root,T(0,2,0,.27,.30,.27)),'#c3a381');
@@ -116,5 +110,5 @@ export function drawWorld(r,s,mode,time){
       }
     }
   }
-  if(mode==='play'&&s.stage<5){const p=target(s);add('sphere',p.x,2.6+Math.sin(time*2)*.18,p.z,.18,.18,.18,'#f1d48d');add('cone',p.x,2.1,p.z,.12,.20,.12,'#f1d48d',Math.PI)}
+  if(mode==='play'&&!s.climb&&!s.landing){const p=target(s);add('sphere',p.x,2.6+Math.sin(time*2)*.18,p.z,.18,.18,.18,'#f1d48d');add('cone',p.x,2.1,p.z,.12,.20,.12,'#f1d48d',Math.PI)}
 }
