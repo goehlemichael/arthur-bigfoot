@@ -13,4 +13,4 @@
 [data-view=radar] .orbit{width:100px;height:100px;border-color:#88cdb36b;transform:translate(-50%,-50%)}[data-view=radar] .orbit-b{width:50px;height:50px}[data-view=radar] .orbit-c{width:150px;height:150px}
 [data-view=orbits] .celestial{width:28px;height:28px;background:#f1cf87;box-shadow:0 0 30px #e6c47e88}
 button:disabled{opacity:.55;cursor:default}#objectiveHint{max-width:calc(100vw - 28px);white-space:normal;text-align:center}
-@media(orientation:portrait) and (max-width:760px){#terminalArt{height:170px}.mission p{max-width:55ch}#observatory{padding:20px}#observatory h2{font-size:26px}#hud .privacy{background:#12291fa8}#terminalArt>span{font-size:8px}}
+@media(orientation:portrait) and (max-width:760px){#subtitle{bottom:calc(250px + var(--safe))}#terminalArt{height:170px}.mission p{max-width:55ch}#observatory{padding:20px}#observatory h2{font-size:26px}#hud .privacy{background:#12291fa8}#terminalArt>span{font-size:8px}}
